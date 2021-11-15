@@ -10,7 +10,7 @@ spec:
   ports:
   - protocol: TCP
     port: 80
-    targetPort: 3500
+    targetPort: 3000
   type: LoadBalancer
 
 ---
@@ -32,14 +32,14 @@ spec:
       annotations:
         dapr.io/enabled: "true"
         dapr.io/app-id: "dotnetapp"
-        dapr.io/app-port: "3500"
+        dapr.io/app-port: "3000"
         dapr.io/config: "tracing"
     spec:
       containers:
       - name: dotnet
         image: dotnet:latest
         ports:
-        - containerPort: 3500
+        - containerPort: 3000
         imagePullPolicy: Never
         resources:
           limits:

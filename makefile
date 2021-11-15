@@ -13,3 +13,5 @@ helm install redis bitnami/redis
 kubectl apply -f pubsub.yaml
 kubectl apply -f statestore.yaml
 
+kubectl apply -f dotnet.yaml
+
