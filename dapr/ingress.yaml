@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dapr-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  rules:
+    - host: banq
+      http:
+        paths:
+          # Only expose the Dapr invoke API, lets us call our services and nothing more
+          - path: /v1.0/invoke/
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway-dapr
+                port: 
+                  number: 80                
+          # Everything else falls through to the frontend-host for serving the SPA         
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: daprstore-frontend-host
+                port: 
+                  number: 8000  
