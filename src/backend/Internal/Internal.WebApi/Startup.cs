@@ -1,17 +1,11 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Internal
 {
@@ -34,6 +28,24 @@ namespace Internal
                 PropertyNameCaseInsensitive = true,
             }));
 
+            //services.AddAuthentication(options =>
+            //{
+            //    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            //    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            //}).AddJwtBearer(o =>
+            //{
+            //    o.Authority = Configuration["Jwt:Authority"];
+            //    o.Audience = Configuration["Jwt:Audience"];
+            //    o.Events = new JwtBearerEvents()
+            //    {
+            //        //OnAuthenticationFailed = c =>
+            //        //{
+            //        //    c.NoResult();
+
+            //        //    c.Response.StatusCode = 500;
+            //        //    return c.Response.Body.WriteAsync("An error occured processing your authentication.");
+            //    };
+            //});
 
             services.AddSwaggerGen(c =>
             {
@@ -56,7 +68,9 @@ namespace Internal
 
             app.UseCloudEvents();
 
-            app.UseAuthorization();
+            app.UseAuthentication();
+
+            //app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

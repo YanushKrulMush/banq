@@ -17,7 +17,7 @@ spec:
         dapr.io/enabled: "true"
         dapr.io/app-id: "dotnetapp"
         dapr.io/app-port: "3000"
-        dapr.io/config: "tracing"
+        # dapr.io/config: "tracing"
     spec:
       containers:
       - name: dotnet

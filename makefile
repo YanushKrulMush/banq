@@ -13,12 +13,14 @@ helm install redis bitnami/redis
 kubectl apply -f pubsub.yaml
 kubectl apply -f statestore.yaml
 
-# nginx
-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-helm repo update
-helm install nginx ingress-nginx/ingress-nginx -f ./dapr-annotations.yaml
+# ingress/nginx
+helm install api-gateway ingress-nginx/ingress-nginx --values ./ingress-controller.yaml
+kubectl create -f .\ingress-routes.yaml
 
-kubectl apply -f .\ingress.yaml
+# keycloak
+kubectl create -f https://raw.githubusercontent.com/keycloak/keycloak-quickstarts/latest/kubernetes-examples/keycloak.yaml
+minikube service --url keycloak
 
-kubectl apply -f dotnet.yaml
-
+# dotnet
+minikube docker-env | Invoke-Expression
+docker build . -t dotnet:latest
