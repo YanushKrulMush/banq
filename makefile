@@ -14,7 +14,8 @@ kubectl apply -f pubsub.yaml
 kubectl apply -f statestore.yaml
 
 # ingress/nginx
-helm install api-gateway ingress-nginx/ingress-nginx --values ./ingress-controller.yaml
+kubectl create namespace nginx
+helm install nginx-ingress ingress-nginx/ingress-nginx -f dapr-annotations.yaml  --namespace nginx
 kubectl create -f .\ingress-routes.yaml
 
 # keycloak
@@ -23,4 +24,4 @@ minikube service --url keycloak
 
 # dotnet
 minikube docker-env | Invoke-Expression
-docker build . -t dotnet:latest
+docker build .\src\backend\Internal -t dotnet-app:latest

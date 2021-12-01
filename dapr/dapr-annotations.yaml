@@ -3,3 +3,4 @@ controller:
     dapr.io/enabled: "true"
     dapr.io/app-id: "nginx-ingress"
     dapr.io/app-port: "3500"
+    dapr.io/sidecar-listen-addresses: "0.0.0.0"
