@@ -14,8 +14,8 @@ kubectl apply -f pubsub.yaml
 kubectl apply -f statestore.yaml
 
 # ingress/nginx
-kubectl create namespace nginx
-helm install nginx-ingress ingress-nginx/ingress-nginx -f dapr-annotations.yaml  --namespace nginx
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm install nginx-ingress ingress-nginx/ingress-nginx -f dapr-annotations.yaml
 kubectl create -f .\ingress-routes.yaml
 
 # keycloak

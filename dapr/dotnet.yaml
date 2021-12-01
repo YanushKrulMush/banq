@@ -16,14 +16,14 @@ spec:
       annotations:
         dapr.io/enabled: "true"
         dapr.io/app-id: "dotnet-app"
-        dapr.io/app-port: "3500"
+        dapr.io/app-port: "80"
         dapr.io/config: "tracing"
     spec:
       containers:
       - name: dotnet-app
         image: dotnet-app:latest
         ports:
-        - containerPort: 3500
+        - containerPort: 80
         imagePullPolicy: Never
         resources:
           limits:
