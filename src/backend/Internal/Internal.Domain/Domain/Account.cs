@@ -7,14 +7,12 @@ namespace Internal.Domain
 {
     public class Account
     {
-        /// <summary>
-        /// Gets or sets account id.
-        /// </summary>
-        public string Id { get; set; }
+        public int Number { get; set; }
 
-        /// <summary>
-        /// Gets or sets account balance.
-        /// </summary>
         public decimal Balance { get; set; }
+
+        public string Currency { get; set; }
+
+        public DateTime OpenedOn { get; set; }
     }
 }

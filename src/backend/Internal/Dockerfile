@@ -2,11 +2,14 @@ FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build-env
 WORKDIR /app
 
 # Copy csproj and restore as distinct layers
-COPY Internal.WebApi/*.csproj ./
+COPY *.sln .
+COPY Internal.WebApi/*.csproj ./Internal.WebApi/
+COPY Internal.Domain/*.csproj ./Internal.Domain/
 RUN dotnet restore
 
 # Copy everything else and build
-COPY Internal.WebApi/ ./
+COPY Internal.WebApi/ ./Internal.WebApi/
+COPY Internal.Domain/ ./Internal.Domain/
 RUN dotnet publish -c Release -o out
 
 # final stage/image
