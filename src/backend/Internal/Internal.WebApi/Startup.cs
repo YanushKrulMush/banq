@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text.Json;
 
@@ -38,6 +39,11 @@ namespace Internal
                 o.RequireHttpsMetadata = false;
                 o.Authority = Configuration["Jwt:Authority"];
                 o.Audience = Configuration["Jwt:Audience"];
+                o.TokenValidationParameters = new
+                TokenValidationParameters()
+                {
+                    ValidateAudience = false
+                };
                 o.Events = new JwtBearerEvents()
                 {
                     OnAuthenticationFailed = c =>

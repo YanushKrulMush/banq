@@ -2,27 +2,23 @@
 using Internal.Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace Internal.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [ApiController]
     public class AccountController : ControllerBase
     {
         private const string StoreName = "statestore";
-
         private readonly DaprClient _daprClient;
         private readonly ILogger<AccountController> _logger;
-
-        public AccountController(DaprClient daprClient,
-            ILogger<AccountController> logger)
-        {
-            _daprClient = daprClient;
-            _logger = logger;
-        }
+        private readonly DatabaseContext _dbContext;
 
         [HttpGet("test")]
         public ActionResult Get()
@@ -31,55 +27,34 @@ namespace Internal.Controllers
         }
 
         [HttpGet("account")]
-        public ActionResult<Account> GetAccount()
+        public async Task<ActionResult<Account>> GetAccount()
         {
-            var account = new Account
-            {
-                Number = 1234,
-                Balance = 150190,
-                Currency = "PLN",
-                OpenedOn = DateTime.Now.AddDays(-5)
-            };
-
-            return Ok(account);
+            var userName = User.Claims?.FirstOrDefault(c => c.Type.Equals(ClaimTypes.NameIdentifier, StringComparison.OrdinalIgnoreCase))?.Value;
+            var account = await _dbContext.Accounts.FirstOrDefaultAsync(x => x.Number == userName);
+            return account == null ? NotFound() : Ok(account);
         }
 
         [HttpGet("transactions")]
-        public ActionResult<TransactionDetailsListResponseDto> GetTransactions()
+        public async Task<ActionResult<TransactionDetailsListResponseDto>> GetTransactions()
         {
-            var result = new TransactionDetailsListResponseDto
-            {
-                Items = new List<Transaction>
-                {
-                    new Transaction
-                    {
-                        Id = 1,
-                        Ammount = 100,
-                        Currency = "PLN",
-                        TransactionType = TransactionType.OutgoingTransfer,
-                        Date = DateTime.Now.AddDays(-1),
-                    },
-                    new Transaction
-                    {
-                        Id = 2,
-                        Ammount = 200,
-                        Currency = "PLN",
-                        TransactionType = TransactionType.IncomingTransfer,
-                        Date = DateTime.Now.AddDays(-2),
-                    },
-                    new Transaction
-                    {
-                        Id = 3,
-                        Ammount = 300,
-                        Currency = "PLN",
-                        TransactionType = TransactionType.OutgoingTransfer,
-                        Date = DateTime.Now.AddDays(-3),
-                    },
-                }
-            };
+            var userName = User.Claims?.FirstOrDefault(c => c.Type.Equals(ClaimTypes.NameIdentifier, StringComparison.OrdinalIgnoreCase))?.Value;
+            var transactions = await _dbContext.Transactions
+                .Include(x => x.Account)
+                .Where(x => x.Account.Number == userName)
+                .ToListAsync();
 
-            return Ok(result);
+            return Ok(new TransactionDetailsListResponseDto { Items = transactions });
         }
+
+        [HttpPost("register")]
+        public async Task<ActionResult<Account>> Register()
+        {
+            var userName = User.Claims?.FirstOrDefault(c => c.Type.Equals(ClaimTypes.NameIdentifier, StringComparison.OrdinalIgnoreCase))?.Value;
+            var account = await _dbContext.Accounts.FirstOrDefaultAsync(x => x.Number == userName);
+            return account == null ? NotFound() : Ok(account);
+        }
+
+
 
         //[Topic("pubsub", "deposit")]
         //[HttpPost("deposit")]
