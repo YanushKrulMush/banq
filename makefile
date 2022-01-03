@@ -21,7 +21,14 @@ kubectl create -f ./dapr/ingress/ingress-routes.yaml
 kubectl create -f https://raw.githubusercontent.com/keycloak/keycloak-quickstarts/latest/kubernetes-examples/keycloak.yaml
 minikube service --url keycloak
 
+#postgres
+kubectl create -f postgres-configmap.yaml 
+kubectl create -f postgres-storage.yaml 
+kubectl create -f postgres-deployment.yaml 
+kubectl create -f postgres-service.yaml
+
 # dotnet
 minikube docker-env | Invoke-Expression
 docker build ./src/backend/Internal -t dotnet-app:latest
 kubectl apply -f ./dapr/dotnet.yaml
+
