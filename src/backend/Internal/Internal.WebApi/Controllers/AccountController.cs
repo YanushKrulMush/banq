@@ -20,6 +20,13 @@ namespace Internal.Controllers
         private readonly ILogger<AccountController> _logger;
         private readonly DatabaseContext _dbContext;
 
+        public AccountController(DaprClient daprClient, ILogger<AccountController> logger, DatabaseContext dbContext)
+        {
+            _daprClient = daprClient;
+            _logger = logger;
+            _dbContext = dbContext;
+        }
+
         [HttpGet("test")]
         public ActionResult Get()
         {
@@ -46,6 +53,24 @@ namespace Internal.Controllers
             return Ok(new TransactionDetailsListResponseDto { Items = transactions });
         }
 
+        [HttpPost("transactions")]
+        public async Task<ActionResult> AddTransaction(AddTransactionDto request)
+        {
+            var userName = User.Claims?.FirstOrDefault(c => c.Type.Equals(ClaimTypes.NameIdentifier, StringComparison.OrdinalIgnoreCase))?.Value;
+            var account = await _dbContext.Accounts.FirstOrDefaultAsync(x => x.Number == userName);
+            var newTransaction = new Transaction
+            {
+                Amount = request.Amount,
+                Description = request.Description,
+                Account = account,
+                TransactionType = TransactionType.OutgoingTransfer,
+                Date = DateTime.UtcNow
+            };
+            await _dbContext.Transactions.AddAsync(newTransaction);
+
+            return Created("", newTransaction);
+        }
+
         [HttpPost("register")]
         public async Task<ActionResult<Account>> Register()
         {
@@ -53,8 +78,6 @@ namespace Internal.Controllers
             var account = await _dbContext.Accounts.FirstOrDefaultAsync(x => x.Number == userName);
             return account == null ? NotFound() : Ok(account);
         }
-
-
 
         //[Topic("pubsub", "deposit")]
         //[HttpPost("deposit")]
