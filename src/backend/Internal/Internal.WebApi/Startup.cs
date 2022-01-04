@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Internal
 {
@@ -49,8 +50,29 @@ namespace Internal
                     OnAuthenticationFailed = c =>
                     {
                         c.NoResult();
-                        c.Response.StatusCode = 401;                       
+                        c.Response.StatusCode = 401;
                         return c.Response.WriteAsync("An error occured processing your authentication.");
+                    },
+                    OnMessageReceived = context =>
+                    {
+                        string authorization = context.Request.Headers["Authorization"];
+
+                        // If no authorization header found, nothing to process further
+                        if (string.IsNullOrEmpty(authorization))
+                        {
+                            context.NoResult();
+                            return Task.CompletedTask;
+                        }
+                        context.Token = authorization.Trim();
+
+                        // If no token found, no further work possible
+                        if (string.IsNullOrEmpty(context.Token))
+                        {
+                            context.NoResult();
+                            return Task.CompletedTask;
+                        }
+
+                        return Task.CompletedTask;
                     }
                 };
             });
