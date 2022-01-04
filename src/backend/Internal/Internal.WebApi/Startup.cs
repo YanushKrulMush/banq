@@ -1,3 +1,4 @@
+using Internal.Domain;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -76,6 +77,7 @@ namespace Internal
                     }
                 };
             });
+            services.AddDataModule(Configuration);
 
             services.AddSwaggerGen(c =>
             {

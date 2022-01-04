@@ -71,12 +71,13 @@ namespace Internal.Controllers
             return Created("", newTransaction);
         }
 
+        [AllowAnonymous]
         [HttpPost("register")]
         public async Task<ActionResult<Account>> Register()
         {
             var userName = User.Claims?.FirstOrDefault(c => c.Type.Equals(ClaimTypes.NameIdentifier, StringComparison.OrdinalIgnoreCase))?.Value;
             var account = await _dbContext.Accounts.FirstOrDefaultAsync(x => x.Number == userName);
-            return account == null ? NotFound() : Ok(account);
+            return Ok();
         }
 
         //[Topic("pubsub", "deposit")]
