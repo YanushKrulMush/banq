@@ -68,7 +68,7 @@ namespace Internal.Controllers
             };
             await _dbContext.Transactions.AddAsync(newTransaction);
 
-            return Created("", newTransaction);
+            return Created("", new { });
         }
 
         [AllowAnonymous]

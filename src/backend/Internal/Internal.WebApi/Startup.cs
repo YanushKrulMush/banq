@@ -48,12 +48,12 @@ namespace Internal
                 };
                 o.Events = new JwtBearerEvents()
                 {
-                    OnAuthenticationFailed = c =>
-                    {
-                        c.NoResult();
-                        c.Response.StatusCode = 401;
-                        return c.Response.WriteAsync("An error occured processing your authentication.");
-                    },
+                    //OnAuthenticationFailed = c =>
+                    //{
+                    //    c.NoResult();
+                    //    c.Response.StatusCode = 401;
+                    //    return c.Response.WriteAsync("An error occured processing your authentication.");
+                    //},
                     OnMessageReceived = context =>
                     {
                         string authorization = context.Request.Headers["Authorization"];
