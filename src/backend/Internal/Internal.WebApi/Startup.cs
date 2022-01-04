@@ -78,11 +78,13 @@ namespace Internal
                 };
             });
             services.AddDataModule(Configuration);
-
+            services.AddAutoMapper(typeof(Startup));
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Internal", Version = "v1" });
             });
+            services.AddDaprClient();
+            services.AddHttpClient();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

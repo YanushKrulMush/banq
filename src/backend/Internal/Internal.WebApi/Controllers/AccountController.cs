@@ -1,12 +1,17 @@
-﻿using Dapr.Client;
+﻿using AutoMapper;
+using Dapr.Client;
 using Internal.Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Internal.Controllers
@@ -16,29 +21,28 @@ namespace Internal.Controllers
     public class AccountController : ControllerBase
     {
         private const string StoreName = "statestore";
+        private readonly string KeycloakUrl;
+
         private readonly DaprClient _daprClient;
-        private readonly ILogger<AccountController> _logger;
         private readonly DatabaseContext _dbContext;
+        private readonly IMapper _mapper;
+        private readonly HttpClient _httpClient;
 
-        public AccountController(DaprClient daprClient, ILogger<AccountController> logger, DatabaseContext dbContext)
+        public AccountController(DaprClient daprClient, DatabaseContext dbContext, IMapper mapper, IHttpClientFactory factory, IConfiguration configuration)
         {
+            KeycloakUrl = configuration["Jwt:Authority"];
             _daprClient = daprClient;
-            _logger = logger;
             _dbContext = dbContext;
-        }
-
-        [HttpGet("test")]
-        public ActionResult Get()
-        {
-            return Ok("dupa");
+            _mapper = mapper;
+            _httpClient = factory.CreateClient();
         }
 
         [HttpGet("account")]
-        public async Task<ActionResult<Account>> GetAccount()
+        public async Task<ActionResult<AccountDto>> GetAccount()
         {
             var userName = User.Claims?.FirstOrDefault(c => c.Type.Equals(ClaimTypes.NameIdentifier, StringComparison.OrdinalIgnoreCase))?.Value;
             var account = await _dbContext.Accounts.FirstOrDefaultAsync(x => x.Number == userName);
-            return account == null ? NotFound() : Ok(account);
+            return account == null ? NotFound() : Ok(_mapper.Map<AccountDto>(account));
         }
 
         [HttpGet("transactions")]
@@ -58,55 +62,58 @@ namespace Internal.Controllers
         {
             var userName = User.Claims?.FirstOrDefault(c => c.Type.Equals(ClaimTypes.NameIdentifier, StringComparison.OrdinalIgnoreCase))?.Value;
             var account = await _dbContext.Accounts.FirstOrDefaultAsync(x => x.Number == userName);
+            if (account == null)
+            {
+                return NotFound();
+            }
             var newTransaction = new Transaction
             {
                 Amount = request.Amount,
                 Description = request.Description,
                 Account = account,
                 TransactionType = TransactionType.OutgoingTransfer,
-                Date = DateTime.UtcNow
+                Date = DateTime.UtcNow,
+                Currency = account.Currency
             };
             await _dbContext.Transactions.AddAsync(newTransaction);
+            await _dbContext.SaveChangesAsync();
 
-            return Created("", new { });
+            return Created("", _mapper.Map<TransactionDto>(newTransaction));
         }
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public async Task<ActionResult<Account>> Register()
+        public async Task<ActionResult<Account>> Register(RegisterDto request)
         {
-            var userName = User.Claims?.FirstOrDefault(c => c.Type.Equals(ClaimTypes.NameIdentifier, StringComparison.OrdinalIgnoreCase))?.Value;
-            var account = await _dbContext.Accounts.FirstOrDefaultAsync(x => x.Number == userName);
+            var nvc = new List<KeyValuePair<string, string>>();
+            nvc.Add(new KeyValuePair<string, string>("username", "admin"));
+            nvc.Add(new KeyValuePair<string, string>("password", "admin"));
+            nvc.Add(new KeyValuePair<string, string>("grant_type", "password"));
+            nvc.Add(new KeyValuePair<string, string>("client_id", "admin-cli"));
+
+            var req = new HttpRequestMessage(HttpMethod.Post, $"{KeycloakUrl}/protocol/openid-connect/token") { Content = new FormUrlEncodedContent(nvc) };
+            var res = await _httpClient.SendAsync(req);
+            var content = await res.Content.ReadAsStringAsync();
+            var x = JsonConvert.DeserializeObject<KeycloakResponse>(content);
+
+            var req2 = new HttpRequestMessage(HttpMethod.Post, $"{KeycloakUrl.Replace("auth", "auth/admin")}/users");
+            req2.Content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
+            req2.Headers.Add("Authorization", $"Bearer {x.access_token}");
+            var res2 = await _httpClient.SendAsync(req2);
+
+            var account = new Account
+            {
+            };
+            await _dbContext.Accounts.AddAsync(account);
+            await _dbContext.SaveChangesAsync();
+
+            //await _daprClient.PublishEventAsync(StoreName, "user", account);
             return Ok();
         }
+    }
 
-        //[Topic("pubsub", "deposit")]
-        //[HttpPost("deposit")]
-        //public async Task<ActionResult<Account>> Deposit(Transaction transaction)
-        //{
-        //    _logger.LogDebug("Enter deposit");
-        //    var state = await _daprClient.GetStateEntryAsync<Account>(StoreName, transaction.Id);
-        //    state.Value ??= new Account() { Id = transaction.Id, };
-        //    state.Value.Balance += transaction.Amount;
-        //    await state.SaveAsync();
-        //    return state.Value;
-        //}
-
-        //[Topic("pubsub", "withdraw")]
-        //[HttpPost("withdraw")]
-        //public async Task<ActionResult<Account>> Withdraw(Transaction transaction)
-        //{
-        //    _logger.LogDebug("Enter withdraw");
-        //    var state = await _daprClient.GetStateEntryAsync<Account>(StoreName, transaction.Id);
-
-        //    if (state.Value == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    state.Value.Balance -= transaction.Amount;
-        //    await state.SaveAsync();
-        //    return state.Value;
-        //}
+    public record KeycloakResponse
+    {
+        public string access_token { get; set; }
     }
 }
