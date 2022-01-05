@@ -1,9 +1,20 @@
-FROM maven:3.8.4-openjdk-8-slim AS build
-COPY src /usr/src/app/src
-COPY pom.xml /usr/src/app
-RUN mvn -f /usr/src/app/pom.xml clean package
+FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build-env
+WORKDIR /app
 
-FROM gcr.io/distroless/java
-COPY --from=build /usr/src/app/target/*.jar /usr/app/api.jar
-EXPOSE 8080
-ENTRYPOINT ["java","-jar","/usr/app/api.jar"]
+# Copy csproj and restore as distinct layers
+COPY *.sln .
+COPY Broker.WebApi/*.csproj ./Broker.WebApi/
+COPY Broker.Domain/*.csproj ./Broker.Domain/
+RUN dotnet restore
+
+# Copy everything else and build
+COPY Broker.WebApi/ ./Broker.WebApi/
+COPY Broker.Domain/ ./Broker.Domain/
+RUN dotnet publish -c Release -o out
+
+# final stage/image
+FROM mcr.microsoft.com/dotnet/aspnet:5.0
+WORKDIR /app
+COPY --from=build-env /app/out .
+EXPOSE 3000
+ENTRYPOINT ["dotnet", "Broker.WebApi.dll"]

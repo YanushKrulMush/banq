@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Broker.WebApi", "Broker.WebApi\Broker.WebApi.csproj", "{BB1D01F1-A6B4-44B6-A413-309293F91B1B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Broker.Domain", "Broker.Domain\Broker.Domain.csproj", "{05062B5D-51A6-403B-9AEB-C24C6DC0D7BC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BB1D01F1-A6B4-44B6-A413-309293F91B1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB1D01F1-A6B4-44B6-A413-309293F91B1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB1D01F1-A6B4-44B6-A413-309293F91B1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB1D01F1-A6B4-44B6-A413-309293F91B1B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05062B5D-51A6-403B-9AEB-C24C6DC0D7BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05062B5D-51A6-403B-9AEB-C24C6DC0D7BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05062B5D-51A6-403B-9AEB-C24C6DC0D7BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05062B5D-51A6-403B-9AEB-C24C6DC0D7BC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3BF75562-D795-4EEF-AEB1-600E7139071D}
+	EndGlobalSection
+EndGlobal

@@ -32,3 +32,8 @@ minikube docker-env | Invoke-Expression
 docker build ./src/backend/Internal -t dotnet-app:latest
 kubectl apply -f ./dapr/dotnet.yaml
 
+# totally java
+minikube docker-env | Invoke-Expression
+docker build ./src/backend/Broker -t java-app:latest
+kubectl apply -f ./dapr/dotnet.yaml
+
