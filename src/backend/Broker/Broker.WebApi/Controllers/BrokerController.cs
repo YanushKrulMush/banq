@@ -1,15 +1,11 @@
 ﻿using AutoMapper;
 using Broker.Domain;
-using Dapr;
-using Dapr.Client;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -19,21 +15,13 @@ namespace Broker.Controllers
     [ApiController]
     public class BrokerController : ControllerBase
     {
-        private const string PubSubName = "redis-pubsub";
-        private readonly string KeycloakUrl;
-
-        private readonly DaprClient _daprClient;
         private readonly DatabaseContext _dbContext;
         private readonly IMapper _mapper;
-        private readonly HttpClient _httpClient;
 
-        public BrokerController(DaprClient daprClient, DatabaseContext dbContext, IMapper mapper, IHttpClientFactory factory, IConfiguration configuration)
+        public BrokerController(DatabaseContext dbContext, IMapper mapper)
         {
-            KeycloakUrl = configuration["Jwt:Authority"];
-            _daprClient = daprClient;
             _dbContext = dbContext;
             _mapper = mapper;
-            _httpClient = factory.CreateClient();
         }
 
         [HttpGet("stocks")]
@@ -90,19 +78,6 @@ namespace Broker.Controllers
             }
             await _dbContext.SaveChangesAsync();
             return Ok(accountStock.Quantity);
-        }
-
-        [Topic(PubSubName, "user")]
-        [HttpPost("add/user")]
-        public async Task<ActionResult<Account>> AddUser(AccountDto account)
-        {
-            var newAccount = new Account
-            {
-                Number = account.Number,
-            };
-            await _dbContext.Accounts.AddAsync(newAccount);
-            await _dbContext.SaveChangesAsync();
-            return Ok();
         }
     }
 
