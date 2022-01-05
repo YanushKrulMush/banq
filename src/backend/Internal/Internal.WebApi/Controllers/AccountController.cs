@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Dapr;
 using Dapr.Client;
 using Internal.Domain;
 using Microsoft.AspNetCore.Authorization;
@@ -20,7 +21,7 @@ namespace Internal.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private const string StoreName = "statestore";
+        private const string PubSubName = "redis-pubsub";
         private readonly string KeycloakUrl;
 
         private readonly DaprClient _daprClient;
@@ -83,8 +84,17 @@ namespace Internal.Controllers
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public async Task<ActionResult<Account>> Register(RegisterDto request)
+        public async Task<ActionResult<Account>> Register(RegisterRequestDto registerReguest)
         {
+            var request = new RegisterDto
+            {
+                firstName = registerReguest.FirstName,
+                lastName = registerReguest.LastName,
+                email = registerReguest.Email,
+                username = registerReguest.Username,
+                enabled = true,
+                credentials = new List<Credentials> { new Credentials { value = registerReguest.Password } }
+            };
             var nvc = new List<KeyValuePair<string, string>>();
             nvc.Add(new KeyValuePair<string, string>("username", "admin"));
             nvc.Add(new KeyValuePair<string, string>("password", "admin"));
@@ -100,14 +110,23 @@ namespace Internal.Controllers
             req2.Content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
             req2.Headers.Add("Authorization", $"Bearer {x.access_token}");
             var res2 = await _httpClient.SendAsync(req2);
+            if (!res2.IsSuccessStatusCode)
+            {
+                return BadRequest("Error creating user");
+            }
+            var number = res2.Headers.Location.LocalPath[(res2.Headers.Location.LocalPath.LastIndexOf('/') + 1)..];
 
             var account = new Account
             {
+                Number = number,
+                Balance = 0,
+                Currency = "PlN",
+                OpenedOn = DateTime.Now
             };
             await _dbContext.Accounts.AddAsync(account);
             await _dbContext.SaveChangesAsync();
-
-            //await _daprClient.PublishEventAsync(StoreName, "user", account);
+            var daprClient = new DaprClientBuilder().Build();
+            await daprClient.PublishEventAsync(PubSubName, "user", account);
             return Ok();
         }
     }

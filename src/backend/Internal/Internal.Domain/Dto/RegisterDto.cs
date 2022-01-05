@@ -6,6 +6,19 @@ using System.Threading.Tasks;
 
 namespace Internal.Domain
 {
+    public record RegisterRequestDto
+    {
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
+
+        public string Email { get; set; }
+
+        public string Username { get; set; }
+
+        public string Password { get; set; }
+    }
+
     public record RegisterDto
     {
         public string firstName { get; set; }
@@ -27,7 +40,7 @@ namespace Internal.Domain
 
         public string type { get; set; } = "password";
 
-        public bool temporary { get; set; }
+        public bool temporary { get; set; } = false;
 
     }
 

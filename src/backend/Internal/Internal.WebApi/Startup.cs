@@ -83,7 +83,7 @@ namespace Internal
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Internal", Version = "v1" });
             });
-            services.AddDaprClient();
+            services.AddControllers().AddDapr();
             services.AddHttpClient();
         }
 
@@ -100,14 +100,14 @@ namespace Internal
 
             app.UseRouting();
 
-            //app.UseCloudEvents();
+            app.UseCloudEvents();
             app.UseAuthentication();
 
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
-                //endpoints.MapSubscribeHandler();
+                endpoints.MapSubscribeHandler();
                 endpoints.MapControllers();
             });
         }
