@@ -3,21 +3,21 @@ using Dapr;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
-namespace Broker.WebApi.Controllers
+namespace Broker.WebApi
 {
     [ApiController]
-    public class PubSub : Controller
-    {
-        private const string PubSubName = "redis-pubsub";
+    [Route("[controller]")]
+    public class PubSubController : Controller
+    {       
         private readonly DatabaseContext _dbContext;
 
-        public PubSub(DatabaseContext dbContext)
+        public PubSubController(DatabaseContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        [Topic(PubSubName, "user")]
-        [HttpPost("add/user")]
+        [Topic(Consts.PubSubName, "user")]
+        [HttpPost("add/account")]
         public async Task<ActionResult<Account>> AddUser(AccountDto account)
         {
             System.Console.WriteLine("PUBSUBUJE SIE");

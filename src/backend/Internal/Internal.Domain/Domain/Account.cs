@@ -13,7 +13,7 @@ namespace Internal.Domain
 
         public string Number { get; set; }
 
-        public decimal Balance { get; set; }
+        public double Balance { get; set; }
 
         public string Currency { get; set; }
 

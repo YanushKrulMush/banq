@@ -44,7 +44,8 @@ namespace Broker
                 o.TokenValidationParameters = new
                 TokenValidationParameters()
                 {
-                    ValidateAudience = false
+                    ValidateAudience = false,
+                    ValidateIssuer = false,
                 };
                 o.Events = new JwtBearerEvents()
                 {

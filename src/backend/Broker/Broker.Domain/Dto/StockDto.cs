@@ -18,4 +18,9 @@ namespace Broker.Domain
 
         public int Total { get; set; }
     }
+
+    public record StockListDto
+    {
+        public IEnumerable<StockDto> Items { get; set; }
+    }
 }

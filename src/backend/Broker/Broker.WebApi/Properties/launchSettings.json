@@ -17,7 +17,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "Internal": {
+    "Broker": {
       "commandName": "Project",
       "launchUrl": "swagger",
       "environmentVariables": {

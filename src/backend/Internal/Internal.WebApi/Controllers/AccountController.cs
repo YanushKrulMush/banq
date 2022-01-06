@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Dapr;
 using Dapr.Client;
 using Internal.Domain;
 using Microsoft.AspNetCore.Authorization;
@@ -44,6 +43,20 @@ namespace Internal.Controllers
             var userName = User.Claims?.FirstOrDefault(c => c.Type.Equals(ClaimTypes.NameIdentifier, StringComparison.OrdinalIgnoreCase))?.Value;
             var account = await _dbContext.Accounts.FirstOrDefaultAsync(x => x.Number == userName);
             return account == null ? NotFound() : Ok(_mapper.Map<AccountDto>(account));
+        }
+
+        [AllowAnonymous]
+        [HttpPost("account")]
+        public async Task<ActionResult> GetAccount(ModifyAccountDto request)
+        {
+            var account = await _dbContext.Accounts.FirstOrDefaultAsync(x => x.Number == request.AccountNumber);
+            if (account.Balance < request.Amount)
+            {
+                return BadRequest("Niewystarczająca liczba środków na koncie");
+            }
+            account.Balance -= request.Amount;
+            await _dbContext.SaveChangesAsync();
+            return Ok();
         }
 
         [HttpGet("transactions")]
@@ -115,7 +128,7 @@ namespace Internal.Controllers
             var res2 = await _httpClient.SendAsync(req2);
             if (!res2.IsSuccessStatusCode)
             {
-                return BadRequest("Error creating user");
+                return BadRequest("Nie można stworzyć użytkownika");
             }
             var number = res2.Headers.Location.LocalPath[(res2.Headers.Location.LocalPath.LastIndexOf('/') + 1)..];
 
@@ -123,7 +136,7 @@ namespace Internal.Controllers
             {
                 Number = number,
                 Balance = 0,
-                Currency = "PlN",
+                Currency = "PLN",
                 OpenedOn = DateTime.Now
             };
             await _dbContext.Accounts.AddAsync(account);
@@ -137,5 +150,11 @@ namespace Internal.Controllers
     public record KeycloakResponse
     {
         public string access_token { get; set; }
+    }
+
+    public record ModifyAccountDto
+    {
+        public string AccountNumber { get; set; }
+        public double Amount { get; set; }
     }
 }
