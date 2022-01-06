@@ -8,6 +8,8 @@ namespace Internal.Domain
 {
     public record TransactionDto
     {
+        public int Id { get; set; }
+
         public decimal Amount { get; set; }
 
         public string Currency { get; set; }
