@@ -2,15 +2,17 @@
 using Broker.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Broker.Domain.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20220106131514_second")]
+    partial class second
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -100,13 +102,13 @@ namespace Broker.Domain.Migrations
                         {
                             Id = 2,
                             Name = "Grupa Lotos SA",
-                            Value = 20.0
+                            Value = 10.0
                         },
                         new
                         {
                             Id = 3,
                             Name = "Orange Polska SA",
-                            Value = 30.0
+                            Value = 10.0
                         });
                 });
 

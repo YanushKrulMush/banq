@@ -20,7 +20,7 @@ namespace Broker.WebApi.Controllers
         [HttpPost("add/user")]
         public async Task<ActionResult<Account>> AddUser(AccountDto account)
         {
-            System.Console.WriteLine("YES");
+            System.Console.WriteLine("PUBSUBUJE SIE");
             var newAccount = new Account
             {
                 Number = account.Number,

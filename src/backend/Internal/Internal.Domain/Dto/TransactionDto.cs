@@ -16,6 +16,8 @@ namespace Internal.Domain
 
         public string TransactionType { get; set; }
 
+        public string ReceiverOrSender { get; set; }
+
         public DateTime Date { get; set; }
 
         public string Description { get; set; }

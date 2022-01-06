@@ -41,8 +41,17 @@ namespace Broker.Controllers
             var userName = User.Claims?.FirstOrDefault(c => c.Type.Equals(ClaimTypes.NameIdentifier, StringComparison.OrdinalIgnoreCase))?.Value;
             var account = await _dbContext.Accounts
                 .FirstOrDefaultAsync(x => x.Number == userName);
+            if (account == null)
+            {
+                return NotFound();
+            }    
+            if (!await _dbContext.Stocks.AnyAsync(x => x.Id == request.StockId))
+            {
+                return BadRequest($"Stock with id {request.StockId} does not exist");
+            }
             var accountStock = await _dbContext.AccountStocks
                 .FirstOrDefaultAsync(x => x.AccountId == account.Id && x.StockId == request.StockId);
+
             if (accountStock is null)
             {
                 accountStock = new AccountStock { AccountId = account.Id, Quantity = request.Quantity, StockId = request.StockId };
@@ -79,10 +88,5 @@ namespace Broker.Controllers
             await _dbContext.SaveChangesAsync();
             return Ok(accountStock.Quantity);
         }
-    }
-
-    public record KeycloakResponse
-    {
-        public string access_token { get; set; }
     }
 }
