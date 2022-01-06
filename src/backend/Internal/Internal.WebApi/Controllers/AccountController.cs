@@ -55,7 +55,7 @@ namespace Internal.Controllers
                 .Where(x => x.Account.Number == userName)
                 .ToListAsync();
 
-            return Ok(new TransactionDetailsListResponseDto { Items = transactions });
+            return Ok(new TransactionDetailsListResponseDto { Items = _mapper.Map<List<TransactionDto>>(transactions) });
         }
 
         [HttpPost("transactions")]
@@ -70,7 +70,10 @@ namespace Internal.Controllers
             var newTransaction = new Transaction
             {
                 Amount = request.Amount,
-                Description = request.Description,
+                Title = request.Title,
+                RecipientAccountNumber = request.RecipientAccountNumber,
+                RecipientAddress = request.RecipientAddress,
+                RecipientName = request.RecipientName,
                 Account = account,
                 TransactionType = TransactionType.OutgoingTransfer,
                 Date = DateTime.UtcNow,

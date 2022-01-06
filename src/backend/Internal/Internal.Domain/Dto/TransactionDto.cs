@@ -12,7 +12,7 @@ namespace Internal.Domain
 
         public string Currency { get; set; }
 
-        public TransactionType TransactionType { get; set; }
+        public string TransactionType { get; set; }
 
         public DateTime Date { get; set; }
 

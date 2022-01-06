@@ -4,6 +4,6 @@ namespace Internal.Domain
 {
     public record TransactionDetailsListResponseDto
     {
-        public IEnumerable<Transaction> Items { get; set; }
+        public IEnumerable<TransactionDto> Items { get; set; }
     }
 }
