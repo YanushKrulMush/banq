@@ -80,6 +80,11 @@ namespace Internal.Controllers
             {
                 return NotFound();
             }
+            if (request.Amount > account.Balance)
+            {
+                return BadRequest("Niewystarczająca liczba środków na koncie");
+            }
+            account.Balance -= request.Amount;
             var newTransaction = new Transaction
             {
                 Amount = request.Amount,
