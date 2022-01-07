@@ -33,6 +33,7 @@ namespace Internal.Domain
     public enum TransactionType
     {
         IncomingTransfer,
-        OutgoingTransfer
+        OutgoingTransfer,
+        InternalTransfer
     }
 }

@@ -59,7 +59,10 @@ namespace Broker.Controllers
                 await daprClient.InvokeMethodAsync<ModifyAccountDto>("dotnet-app", "account", new ModifyAccountDto
                 {
                     AccountNumber = account.Number,
-                    Amount = stock.Value * request.Quantity
+                    Amount = stock.Value * request.Quantity,
+                    Title = $"Zakup akcji {stock.Name}, {request.Quantity} sztuk",
+                    RecipientName = "Konto Indywidualne",
+                    RecipientAccountNumber = "Konto Brokerskie"
                 });
             }
             catch (InvocationException ex)
@@ -96,7 +99,9 @@ namespace Broker.Controllers
                 await daprClient.InvokeMethodAsync<ModifyAccountDto>("dotnet-app", "account", new ModifyAccountDto
                 {
                     AccountNumber = account.Number,
-                    Amount = -stock.Value * request.Quantity
+                    Amount = -stock.Value * request.Quantity,
+                    Title = $"Sprzedaż akcji {stock.Name}, {request.Quantity} sztuk",
+                    RecipientName = "Konto Brokerskie"
                 });
             }
             catch (InvocationException ex)
@@ -141,5 +146,9 @@ namespace Broker.Controllers
     {
         public string AccountNumber { get; set; }
         public double Amount { get; set; }
+        public string RecipientName { get; set; }
+        public string RecipientAddress { get; set; }
+        public string RecipientAccountNumber { get; set; }
+        public string Title { get; set; }
     }
 }

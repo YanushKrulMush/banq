@@ -54,6 +54,19 @@ namespace Internal.Controllers
             {
                 return BadRequest("Niewystarczająca liczba środków na koncie");
             }
+            var newTransaction = new Transaction
+            {
+                Amount = Convert.ToDecimal(request.Amount),
+                Title = request.Title,
+                RecipientAccountNumber = request.RecipientAccountNumber,
+                RecipientAddress = request.RecipientAddress,
+                RecipientName = request.RecipientName,
+                Account = account,
+                TransactionType = TransactionType.InternalTransfer,
+                Date = DateTime.UtcNow,
+                Currency = account.Currency
+            };
+            await _dbContext.Transactions.AddAsync(newTransaction);
             account.Balance -= request.Amount;
             await _dbContext.SaveChangesAsync();
             return Ok();
@@ -161,5 +174,9 @@ namespace Internal.Controllers
     {
         public string AccountNumber { get; set; }
         public double Amount { get; set; }
+        public string RecipientName { get; set; }
+        public string RecipientAddress { get; set; }
+        public string RecipientAccountNumber { get; set; }
+        public string Title { get; set; }
     }
 }
