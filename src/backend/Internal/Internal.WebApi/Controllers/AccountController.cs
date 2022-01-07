@@ -56,7 +56,7 @@ namespace Internal.Controllers
             }
             var newTransaction = new Transaction
             {
-                Amount = Convert.ToDecimal(request.Amount),
+                Amount = -Convert.ToDecimal(request.Amount),
                 Title = request.Title,
                 RecipientAccountNumber = request.RecipientAccountNumber,
                 RecipientAddress = request.RecipientAddress,
