@@ -100,7 +100,7 @@ namespace Internal.Controllers
             account.Balance -= request.Amount;
             var newTransaction = new Transaction
             {
-                Amount = request.Amount,
+                Amount = -request.Amount,
                 Title = request.Title,
                 RecipientAccountNumber = request.RecipientAccountNumber,
                 RecipientAddress = request.RecipientAddress,
@@ -153,7 +153,7 @@ namespace Internal.Controllers
             var account = new Account
             {
                 Number = number,
-                Balance = 0,
+                Balance = 100000,
                 Currency = "PLN",
                 OpenedOn = DateTime.Now
             };

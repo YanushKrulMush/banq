@@ -101,7 +101,8 @@ namespace Broker.Controllers
                     AccountNumber = account.Number,
                     Amount = -stock.Value * request.Quantity,
                     Title = $"Sprzedaż akcji {stock.Name}, {request.Quantity} sztuk",
-                    RecipientName = "Konto Brokerskie"
+                    RecipientName = "Konto Indywidualne",
+                    RecipientAccountNumber = "Konto Brokerskie"
                 });
             }
             catch (InvocationException ex)
