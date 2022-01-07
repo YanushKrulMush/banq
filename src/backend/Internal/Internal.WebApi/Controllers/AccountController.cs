@@ -155,7 +155,7 @@ namespace Internal.Controllers
                 Number = number,
                 Balance = 100000,
                 Currency = "PLN",
-                OpenedOn = DateTime.Now
+                OpenedOn = DateTime.UtcNow
             };
             await _dbContext.Accounts.AddAsync(account);
             await _dbContext.SaveChangesAsync();

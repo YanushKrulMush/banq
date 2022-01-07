@@ -94,6 +94,18 @@ namespace Broker.Controllers
             var accountStock = await _dbContext.AccountStocks
                 .FirstOrDefaultAsync(x => x.AccountId == account.Id && x.StockId == request.StockId);
             var daprClient = new DaprClientBuilder().Build();
+            if (accountStock is null)
+            {
+                return BadRequest($"Brak akcji na koncie");
+            }
+            else
+            {
+                if (request.Quantity > accountStock.Quantity)
+                {
+                    return BadRequest($"Niewystarczająca liczba akcji do sprzedania");
+                }
+                accountStock.Quantity -= request.Quantity;
+            }
             try
             {
                 await daprClient.InvokeMethodAsync<ModifyAccountDto>("dotnet-app", "account", new ModifyAccountDto
@@ -108,19 +120,6 @@ namespace Broker.Controllers
             catch (InvocationException ex)
             {
                 return BadRequest(await ex.Response.Content.ReadAsStringAsync());
-            }
-
-            if (accountStock is null)
-            {
-                return BadRequest($"Brak akcji na koncie");
-            }
-            else
-            {
-                if (request.Quantity > accountStock.Quantity)
-                {
-                    return BadRequest($"Niewystarczająca liczba akcji do sprzedania");
-                }
-                accountStock.Quantity -= request.Quantity;
             }
             await _dbContext.SaveChangesAsync();
             return Ok(accountStock.Quantity);
