@@ -1,7 +1,7 @@
 # AUTORZY
 
-Stanisław Czech
-Kamil Nowakowski
+Stanisław Czech <br />
+Kamil Nowakowski <br />
 Karol Rosół
 
 ## MINIKUBE
