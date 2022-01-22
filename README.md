@@ -1,3 +1,9 @@
+# AUTORZY
+
+Stanisław Czech
+Kamil Nowakowski
+Karol Rosół
+
 ## MINIKUBE
 
 Do postawienia klastra lokalnie potrzebny jest minikube
